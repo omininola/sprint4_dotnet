@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using project.DTO.Bike;
 using project.HATEOAS;
@@ -37,6 +38,7 @@ public class BikeController : Controller
     /// <response code="201">Retorna a Moto criada</response>
     /// <response code="400">Retorna a mensagem de erro</response>
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<BikeResponse>> Create(BikeDTO bikeDTO)
     {
         var bike = await _service.Save(bikeDTO);
@@ -57,6 +59,7 @@ public class BikeController : Controller
     /// <returns>Uma página de Motos</returns>
     /// <response code="200">Retorna uma página de Motos</response>
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<BikeResponse>>> ReadAll(int page, int pageSize)
     {
         var bikes = (await _service.FindAll(page, pageSize)).ToList();
@@ -82,6 +85,7 @@ public class BikeController : Controller
     /// <response code="200">Retorna a Moto encontrada</response>
     /// <response code="404">Retorna caso a Moto não seja encontrada</response>
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<BikeResponse>> ReadById(int id)
     {
         var bike = await _service.FindById(id);
@@ -115,6 +119,7 @@ public class BikeController : Controller
     /// <response code="200">Retorna a Moto atualizada</response>
     /// <response code="404">Retorna caso a Moto não seja encontrada</response>
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<ActionResult<BikeResponse>> Update(int id, BikeDTO bikeDTO)
     {
         var bike = await _service.Update(id, bikeDTO);
@@ -135,6 +140,7 @@ public class BikeController : Controller
     /// <response code="204">Retorna caso a Moto seja deletada com sucesso</response>
     /// <response code="404">Retorna caso a Moto não seja encontrada</response>
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult<BikeResponse>> Delete(int id)
     {
         await _service.Delete(id);

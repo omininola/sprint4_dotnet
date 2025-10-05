@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using project.DTO.Yard;
 using project.HATEOAS;
@@ -35,6 +36,7 @@ public class YardController : Controller
     /// <response code="201">Retorna o Pátio criado</response>
     /// <response code="400">Retorna a mensagem de erro</response>
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<YardResponse>> Create(YardDTO yardDTO)
     {
         var yard = await _service.Save(yardDTO);
@@ -55,6 +57,7 @@ public class YardController : Controller
     /// <returns>Uma página de Pátios</returns>
     /// <response code="200">Retorna uma página de Pátios</response>
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<YardResponse>>> ReadAll(int page, int pageSize)
     {
         var yards = (await _service.FindAll(page, pageSize)).ToList();
@@ -80,6 +83,7 @@ public class YardController : Controller
     /// <response code="200">Retorna o Pátio encontrado</response>
     /// <response code="404">Retorna caso o Pátio não seja encontrado</response>
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<YardResponse>> ReadById(int id)
     {
         var yard = await _service.FindById(id);
@@ -110,6 +114,7 @@ public class YardController : Controller
     /// <response code="200">Retorna o Pátio atualizado</response>
     /// <response code="404">Retorna caso o Pátio não seja encontrado</response>
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<ActionResult<YardResponse>> Update(int id, YardDTO yardDTO)
     {
         var yard = await _service.Update(id, yardDTO);
@@ -130,6 +135,7 @@ public class YardController : Controller
     /// <response code="204">Retorna caso o Pátio seja deletado com sucesso</response>
     /// <response code="404">Retorna caso o Pátio não seja encontrado</response>
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult<YardResponse>> Delete(int id)
     {
         await _service.Delete(id);

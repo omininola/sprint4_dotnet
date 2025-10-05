@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using project.DTO.Subsidiary;
 using project.HATEOAS;
@@ -35,6 +36,7 @@ public class SubsidiaryController : Controller
     /// <response code="201">Retorna a Filial criada</response>
     /// <response code="400">Retorna a mensagem de erro</response>
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<SubsidiaryResponse>> Create(SubsidiaryDTO subsidiaryDTO)
     {
         var subsidiary = await _service.Save(subsidiaryDTO);
@@ -55,6 +57,7 @@ public class SubsidiaryController : Controller
     /// <returns>Uma página de Filiais</returns>
     /// <response code="200">Retorna uma página de Filiais</response>
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<SubsidiaryResponse>>> ReadAll(int page, int pageSize)
     {
         var subsidiaries = (await _service.FindAll(page, pageSize)).ToList();
@@ -80,6 +83,7 @@ public class SubsidiaryController : Controller
     /// <response code="200">Retorna a Filial encontrada</response>
     /// <response code="404">Retorna caso a Filial não seja encontrada</response>
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<SubsidiaryResponse>> ReadById(int id)
     {
         var subsidiary = await _service.FindById(id);
@@ -110,6 +114,7 @@ public class SubsidiaryController : Controller
     /// <response code="200">Retorna a Filial atualizada</response>
     /// <response code="404">Retorna caso a Filial não seja encontrada</response>
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<ActionResult<SubsidiaryResponse>> Update(int id, SubsidiaryDTO subsidiaryDTO)
     {
         var subsidiary = await _service.Update(id, subsidiaryDTO);
@@ -130,6 +135,7 @@ public class SubsidiaryController : Controller
     /// <response code="204">Retorna caso a Filial seja deletada com sucesso</response>
     /// <response code="404">Retorna caso a Filial não seja encontrada</response>
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult<SubsidiaryResponse>> Delete(int id)
     {
         await _service.Delete(id);
