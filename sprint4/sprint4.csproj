@@ -14,11 +14,9 @@
         <PackageReference Include="Oracle.EntityFrameworkCore" Version="9.23.90" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     </ItemGroup>
-
+    
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="sprint4.Tests\obj\project.assets.json" />
-      <_ContentIncludedByDefault Remove="sprint4.Tests\obj\project.packagespec.json" />
-      <_ContentIncludedByDefault Remove="sprint4.Tests\obj\sprint4.Tests.csproj.nuget.dgspec.json" />
+        <InternalsVisibleTo Include="sprint4.IntegrationTests" />
     </ItemGroup>
-
+    
 </Project>

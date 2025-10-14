@@ -15,11 +15,4 @@
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
         <ProjectReference Include="..\sprint4\sprint4.csproj" />
     </ItemGroup>
-
-    <Target Name="CopyDepsAsTestHost" AfterTargets="Build">
-        <Copy SourceFiles="bin/Debug/net9.0/sprint4.deps.json"
-              DestinationFiles="bin/Debug/net9.0/testhost.deps.json"
-              SkipUnchangedFiles="true" />
-    </Target>
-    
 </Project>
