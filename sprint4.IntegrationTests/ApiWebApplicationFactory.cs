@@ -11,28 +11,24 @@ namespace sprint4.IntegrationTests;
 
 internal class ApiWebApplicationFactory : WebApplicationFactory<Program>
 {
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureTestServices(services =>
         {
-            builder.ConfigureTestServices(services =>
-            {
-                services.RemoveAll<DbContextOptions<AppDbContext>>(); 
-                services.RemoveAll<AppDbContext>();
+            services.RemoveAll<DbContextOptions<AppDbContext>>();
+            services.RemoveAll<AppDbContext>();
 
-                var connectionString = "Data Source=oracle.fiap.com.br:1521/orcl;User ID=rm554513;Password=020905";
-                
-                services.AddDbContext<AppDbContext>(options =>
-                {
-                    options.UseOracle(connectionString);
-                });
-    
-                var sp = services.BuildServiceProvider();
-                using (var scope = sp.CreateScope())
-                {
-                    var scopedServices = scope.ServiceProvider;
-                    var db = scopedServices.GetRequiredService<AppDbContext>();
-                    db.Database.EnsureCreated();
-                    db.SaveChanges();
-                }
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseInMemoryDatabase("TestDb_" + Guid.NewGuid());
             });
-        }
+
+            var sp = services.BuildServiceProvider();
+            using (var scope = sp.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.EnsureCreated();
+            }
+        });
+    }
 }
