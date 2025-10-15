@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using project.Data;
-using project.DTO.Yard;
-using project.Exceptions;
-using project.Models;
+using sprint4.Data;
+using sprint4.DTO.Yard;
+using sprint4.Exceptions;
+using sprint4.Models;
 
-namespace project.Services;
+namespace sprint4.Services;
 
 public class YardService : IService<YardResponse, YardDTO>
 {

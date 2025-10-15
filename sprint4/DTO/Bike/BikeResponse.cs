@@ -1,6 +1,6 @@
-using project.HATEOAS;
+using sprint4.HATEOAS;
 
-namespace project.DTO.Bike;
+namespace sprint4.DTO.Bike;
 
 public class BikeResponse
 {

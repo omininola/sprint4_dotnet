@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace project.Exceptions;
+namespace sprint4.Exceptions;
 
 public class ExceptionFilter : IExceptionFilter
 {

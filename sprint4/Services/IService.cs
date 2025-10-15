@@ -1,4 +1,4 @@
-namespace project.Services;
+namespace sprint4.Services;
 
 public interface IService<TResponse, TDto>
 {

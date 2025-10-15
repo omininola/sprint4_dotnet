@@ -1,7 +1,7 @@
-using project.HATEOAS;
-using project.DTO.Yard;
+using sprint4.HATEOAS;
+using sprint4.DTO.Yard;
 
-namespace project.DTO.Subsidiary;
+namespace sprint4.DTO.Subsidiary;
 
 public class SubsidiaryResponse
 {

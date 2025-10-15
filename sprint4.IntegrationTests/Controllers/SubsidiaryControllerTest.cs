@@ -4,10 +4,11 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
-using project.DTO.Subsidiary;
+using sprint4.DTO.Subsidiary;
+using sprint4.IntegrationTests;
 using Xunit;
 
-namespace project.Test.Integration;
+namespace sprint4.IntegrationTests.Controllers;
 
 public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Program>>
 {

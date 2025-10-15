@@ -1,7 +1,7 @@
-using project.HATEOAS;
-using project.DTO.Bike;
+using sprint4.HATEOAS;
+using sprint4.DTO.Bike;
 
-namespace project.DTO.Yard;
+namespace sprint4.DTO.Yard;
 
 public class YardResponse
 {

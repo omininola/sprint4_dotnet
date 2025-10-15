@@ -4,10 +4,10 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
-using project.DTO.Yard;
+using sprint4.DTO.Yard;
 using Xunit;
 
-namespace project.Test.Integration;
+namespace sprint4.IntegrationTests.Controllers;
 
 public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
 {

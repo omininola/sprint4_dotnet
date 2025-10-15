@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sprint4.Test", "sprint4.Test\sprint4.Test.csproj", "{B189F52B-D17C-41EA-868A-967304029FC0}"
-EndProject
+#
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sprint4", "sprint4\sprint4.csproj", "{A8CABA66-46FC-4F4E-A96E-62FB179E5E0B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sprint4.IntegrationTests", "sprint4.IntegrationTests\sprint4.IntegrationTests.csproj", "{E162966F-D06E-4D56-9727-DC2027D139E5}"
@@ -29,10 +27,6 @@ Global
 		{FC0EF9FF-6037-4D5B-A928-DC4852C1299A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC0EF9FF-6037-4D5B-A928-DC4852C1299A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC0EF9FF-6037-4D5B-A928-DC4852C1299A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B189F52B-D17C-41EA-868A-967304029FC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B189F52B-D17C-41EA-868A-967304029FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B189F52B-D17C-41EA-868A-967304029FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B189F52B-D17C-41EA-868A-967304029FC0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A8CABA66-46FC-4F4E-A96E-62FB179E5E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A8CABA66-46FC-4F4E-A96E-62FB179E5E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8CABA66-46FC-4F4E-A96E-62FB179E5E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU

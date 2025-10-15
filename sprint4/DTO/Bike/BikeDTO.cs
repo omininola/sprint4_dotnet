@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace project.DTO.Bike;
+namespace sprint4.DTO.Bike;
 
 public class BikeDTO
 {

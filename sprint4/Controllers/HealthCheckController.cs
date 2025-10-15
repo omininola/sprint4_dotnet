@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace project.Controllers;
+namespace sprint4.Controllers;
 
 [ApiController]
 [Route("/api/health")]

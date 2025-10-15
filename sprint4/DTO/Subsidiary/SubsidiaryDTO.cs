@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace project.DTO.Subsidiary;
+namespace sprint4.DTO.Subsidiary;
 
 public class SubsidiaryDTO
 {

@@ -6,18 +6,16 @@ public class AuthControllerTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
 
-    public AuthControllerTest(ApiWebApplicationFactory factory) : base(factory)
+    public AuthControllerTest(WebApplicationFactory<Program> factory)
     {
         _client = factory.CreateClient();
     }
-
+    
     [Fact]
     public async Task Auth_Login_ShouldReturnOk()
     {
-        // Act
-        var response = await _client.GetAsync("/api/auth/login");
+        var response = await _client.PostAsync("/api/auth/login",  null);
         
-        // Assert
         response.EnsureSuccessStatusCode();
     }
 }

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace project.Data.Migrations
+namespace sprint4.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialSetup : Migration

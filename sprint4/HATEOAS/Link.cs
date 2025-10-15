@@ -1,4 +1,4 @@
-namespace project.HATEOAS;
+namespace sprint4.HATEOAS;
 
 public class Link
 {

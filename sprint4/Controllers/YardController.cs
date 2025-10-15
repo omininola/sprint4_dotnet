@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using project.DTO.Yard;
-using project.HATEOAS;
-using project.Services;
+using sprint4.DTO.Yard;
+using sprint4.HATEOAS;
+using sprint4.Services;
 
-namespace project.Controllers;
+namespace sprint4.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

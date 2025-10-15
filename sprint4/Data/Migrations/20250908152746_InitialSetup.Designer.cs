@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
-using project.Data;
+using sprint4.Data;
 
 #nullable disable
 
-namespace project.Data.Migrations
+namespace sprint4.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20250908152746_InitialSetup")]

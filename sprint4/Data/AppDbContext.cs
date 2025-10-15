@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using project.Models;
+using sprint4.Models;
 
-namespace project.Data;
+namespace sprint4.Data;
 
 public class AppDbContext : DbContext
 {

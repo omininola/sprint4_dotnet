@@ -7,10 +7,10 @@ using Microsoft.IdentityModel.Tokens;
 namespace sprint4.Controllers;
 
 [ApiController]
-[Route("/api/[controller]")]
-public class AuthController : ControllerBase
+[Route("api/[controller]")]
+public class AuthController : Controller
 {
-    [HttpPost("/login")]
+    [HttpPost("login")]
     public IActionResult Login()
     {
         var tokenHandler = new JwtSecurityTokenHandler();

@@ -1,4 +1,4 @@
-namespace project.Exceptions;
+namespace sprint4.Exceptions;
 
 public class NotFoundException : Exception
 {

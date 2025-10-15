@@ -1,4 +1,4 @@
-namespace project.DTO.Yard;
+namespace sprint4.DTO.Yard;
 
 public class YardDTO
 {
