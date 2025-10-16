@@ -1,11 +1,16 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualBasic.CompilerServices;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Newtonsoft.Json;
+using sprint4.DTO.Subsidiary;
 using sprint4.DTO.Yard;
 using Xunit;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace sprint4.IntegrationTests.Controllers;
 
@@ -18,32 +23,58 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
         _client = factory.CreateClient();
     }
 
-    private void AddAuthHeader(HttpClient client)
+    private async Task AddAuthHeader()
     {
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-jwt-token");
+        var response = await _client.PostAsync("/api/auth/login", null);
+        var json = await response.Content.ReadAsStringAsync();
+        
+        using var doc = JsonDocument.Parse(json);
+        var token = doc.RootElement.GetProperty("token").GetString();
+        
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    }
+
+    private async Task<int> CreateSubsidiaryAndReturnItsId()
+    {
+        var dto = new SubsidiaryDTO
+        {
+            Name = "Osasco",
+            Address = "Rua dos Bobos, 123"
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/subsidiaries", dto);
+        var json = await response.Content.ReadAsStringAsync();
+        SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(json);
+
+        if (subsidiary != null) return subsidiary.Id;
+        return 1;
     }
 
     [Fact]
-    public async Task Create_ShouldReturnCreated()
+    public async Task Yard_Create_ShouldReturnCreated()
     {
-        AddAuthHeader(_client);
+        // Arrange
+        await AddAuthHeader();
 
+        var subsidiaryId = await CreateSubsidiaryAndReturnItsId();
+        
         var dto = new YardDTO
         {
             Name = "Osasco I",
-            SubsidiaryId = 1
+            SubsidiaryId = subsidiaryId
         };
 
-        var content = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var response = await _client.PostAsync("/api/yard", content);
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/yard", dto);
 
+        // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]
     public async Task ReadAll_ShouldReturnOk()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
         var response = await _client.GetAsync("/api/yard?page=1&pageSize=10");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -52,7 +83,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task ReadById_ShouldReturnOkOrNotFound()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
         // Create for test
         var dto = new YardDTO
@@ -73,7 +104,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task Update_ShouldReturnOk()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
         // Create for test
         var dto = new YardDTO
@@ -102,7 +133,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task Delete_ShouldReturnNoContent()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
         // Create for test
         var dto = new YardDTO

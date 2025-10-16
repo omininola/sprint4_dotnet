@@ -13,36 +13,32 @@ internal class ApiWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        //builder.ConfigureAppConfiguration((context, configBuilder) =>
-        //{
-        //    var inMemorySettings = new Dictionary<string, string>
-        //    {
-        //        { "UseInMemoryDatabase", "true" }
-        //    };
-        //    configBuilder.AddInMemoryCollection(inMemorySettings);
-        //});
-
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll(typeof(AppDbContext));
             services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
 
-            services.AddDbContext<AppDbContext>(options =>
-            {
-                var connectionString = "Data Source=oracle.fiap.com.br:1521/orcl;User ID=rm554513;Password=020905";
-                options.UseOracle(connectionString);
-            });
+            var connectionString = "Data Source=oracle.fiap.com.br:1521/orcl;User ID=rm554513;Password=020905";
+            services.AddOracle<AppDbContext>(connectionString);
             
-            services.AddAuthentication("TestScheme")
-                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                    "TestScheme", options => { });
+            // services.AddAuthentication(options =>
+            // {
+            //     options.DefaultAuthenticateScheme = "TestScheme";
+            //     options.DefaultChallengeScheme = "TestScheme";
+            // })
+            // .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+            //     "TestScheme", options => { });
 
-            var sp = services.BuildServiceProvider();
-            using (var scope = sp.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                db.Database.EnsureCreated();
-            }
+            var db = CreateDbContext(services);
+            db.Database.EnsureDeleted();
         });
+    }
+
+    private static AppDbContext CreateDbContext(IServiceCollection services)
+    {
+        var sp = services.BuildServiceProvider();
+        var scope = sp.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        return db;
     }
 }

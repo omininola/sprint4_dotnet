@@ -16,12 +16,12 @@ namespace sprint4.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             OracleModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("project.Models.Bike", b =>
+            modelBuilder.Entity("sprint4.Models.Bike", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,13 +51,13 @@ namespace sprint4.Data.Migrations
                     b.ToTable("Bikes");
                 });
 
-            modelBuilder.Entity("project.Models.Subsidiary", b =>
+            modelBuilder.Entity("sprint4.Models.Subsidiary", b =>
                 {
-                    b.Property<int>("SubsidiaryId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubsidiaryId"));
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -67,18 +67,18 @@ namespace sprint4.Data.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.HasKey("SubsidiaryId");
+                    b.HasKey("Id");
 
                     b.ToTable("Subsidiaries");
                 });
 
-            modelBuilder.Entity("project.Models.Yard", b =>
+            modelBuilder.Entity("sprint4.Models.Yard", b =>
                 {
-                    b.Property<int>("YardId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)");
 
-                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("YardId"));
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -87,16 +87,16 @@ namespace sprint4.Data.Migrations
                     b.Property<int>("SubsidiaryId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.HasKey("YardId");
+                    b.HasKey("Id");
 
                     b.HasIndex("SubsidiaryId");
 
                     b.ToTable("Yards");
                 });
 
-            modelBuilder.Entity("project.Models.Bike", b =>
+            modelBuilder.Entity("sprint4.Models.Bike", b =>
                 {
-                    b.HasOne("project.Models.Yard", "Yard")
+                    b.HasOne("sprint4.Models.Yard", "Yard")
                         .WithMany("Bikes")
                         .HasForeignKey("YardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -105,9 +105,9 @@ namespace sprint4.Data.Migrations
                     b.Navigation("Yard");
                 });
 
-            modelBuilder.Entity("project.Models.Yard", b =>
+            modelBuilder.Entity("sprint4.Models.Yard", b =>
                 {
-                    b.HasOne("project.Models.Subsidiary", "Subsidiary")
+                    b.HasOne("sprint4.Models.Subsidiary", "Subsidiary")
                         .WithMany("Yards")
                         .HasForeignKey("SubsidiaryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -116,12 +116,12 @@ namespace sprint4.Data.Migrations
                     b.Navigation("Subsidiary");
                 });
 
-            modelBuilder.Entity("project.Models.Subsidiary", b =>
+            modelBuilder.Entity("sprint4.Models.Subsidiary", b =>
                 {
                     b.Navigation("Yards");
                 });
 
-            modelBuilder.Entity("project.Models.Yard", b =>
+            modelBuilder.Entity("sprint4.Models.Yard", b =>
                 {
                     b.Navigation("Bikes");
                 });

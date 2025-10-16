@@ -20,10 +20,23 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         _client = factory.CreateClient();
     }
 
+    private async Task AddAuthHeader()
+    {
+        var response = await _client.PostAsync("/api/auth/login", null);
+        var json = await response.Content.ReadAsStringAsync();
+        
+        using var doc = JsonDocument.Parse(json);
+        var token = doc.RootElement.GetProperty("token").GetString();
+        
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    }
+    
     [Fact]
     public async Task Subsidiary_Create_ShouldReturnCreated()
     {
         // Arrange
+        await AddAuthHeader();
+        
         var dto = new SubsidiaryDTO
         {
             Name = "Osasco",
@@ -40,6 +53,9 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     [Fact]
     public async Task Subsidiary_ReadAll_ShouldReturnOk()
     {
+        // Arrange
+        await AddAuthHeader();
+        
         // Act
         var response = await _client.GetAsync("/api/subsidiary?page=1&pageSize=10");
         
@@ -51,6 +67,8 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     public async Task Subsidiary_ReadById_ShouldReturnOk()
     {
         // Arrange
+        await AddAuthHeader();
+        
         var dto = new SubsidiaryDTO
         {
             Name = "Test",
@@ -70,6 +88,8 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     public async Task Subsidiary_Update_ShouldReturnOk()
     {
         // Arrange
+        await AddAuthHeader();
+        
         var dto = new SubsidiaryDTO
         {
             Name = "OldName",
@@ -95,6 +115,8 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     public async Task Subsidiary_Delete_ShouldReturnNoContent()
     {
         // Arrange
+        await AddAuthHeader();
+        
         var dto = new SubsidiaryDTO
         {
             Name = "DelName",

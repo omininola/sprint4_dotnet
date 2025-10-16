@@ -14,33 +14,33 @@ namespace sprint4.Data.Migrations
                 name: "Subsidiaries",
                 columns: table => new
                 {
-                    SubsidiaryId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
                     Name = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
                     Address = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subsidiaries", x => x.SubsidiaryId);
+                    table.PrimaryKey("PK_Subsidiaries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Yards",
                 columns: table => new
                 {
-                    YardId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
                     SubsidiaryId = table.Column<int>(type: "NUMBER(10)", nullable: false),
                     Name = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Yards", x => x.YardId);
+                    table.PrimaryKey("PK_Yards", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Yards_Subsidiaries_SubsidiaryId",
                         column: x => x.SubsidiaryId,
                         principalTable: "Subsidiaries",
-                        principalColumn: "SubsidiaryId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -62,7 +62,7 @@ namespace sprint4.Data.Migrations
                         name: "FK_Bikes_Yards_YardId",
                         column: x => x.YardId,
                         principalTable: "Yards",
-                        principalColumn: "YardId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
