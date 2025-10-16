@@ -21,14 +21,6 @@ internal class ApiWebApplicationFactory : WebApplicationFactory<Program>
             var connectionString = "Data Source=oracle.fiap.com.br:1521/orcl;User ID=rm554513;Password=020905";
             services.AddOracle<AppDbContext>(connectionString);
             
-            // services.AddAuthentication(options =>
-            // {
-            //     options.DefaultAuthenticateScheme = "TestScheme";
-            //     options.DefaultChallengeScheme = "TestScheme";
-            // })
-            // .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-            //     "TestScheme", options => { });
-
             var db = CreateDbContext(services);
             db.Database.EnsureDeleted();
         });

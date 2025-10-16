@@ -1,10 +1,15 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Newtonsoft.Json;
 using sprint4.Controllers;
 using sprint4.DTO.Bike;
+using sprint4.DTO.Subsidiary;
+using sprint4.DTO.Yard;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace sprint4.IntegrationTests.Controllers;
 
@@ -21,117 +26,163 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {
         var response = await _client.PostAsync("/api/auth/login", null);
         var json = await response.Content.ReadAsStringAsync();
-
+        
         using var doc = JsonDocument.Parse(json);
         var token = doc.RootElement.GetProperty("token").GetString();
-
+        
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
     [Fact]
     public async Task Bike_Created_ShouldReturnCreated()
     {
+        // Arrange
         await AddAuthHeader();
 
+        var yardId = await CreateYardAndGetItsId();
+        
         var dto = new BikeDTO
         {
             Plate = "123ABC",
             Model = "SPORT",
             Status = "READY",
-            YardId = 1
+            YardId = yardId
         };
 
-        var content = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var response = await _client.PostAsync("/api/bike", content);
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/bike", dto);
 
+        // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]
     public async Task Bike_ReadAll_ShouldReturnOk()
     {
+        // Arrange
         await AddAuthHeader();
 
+        // Act
         var response = await _client.GetAsync("/api/bike?page=0&pageSize=10");
+        
+        // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task Bike_ReadById_ShouldReturnOkOrNotFound()
+    public async Task Bike_ReadById_ShouldReturnOk()
     {
+        // Arrange
         await AddAuthHeader();
 
+        var yardId = await CreateYardAndGetItsId();
+        
         var dto = new BikeDTO
         {
             Plate = "999XYZ",
             Model = "CRUISER",
             Status = "READY",
-            YardId = 1
+            YardId = yardId
         };
-        
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/bike", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var createdBike = JsonSerializer.Deserialize<BikeResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = createdBike?.Id ?? 1;
 
+        var id = await CreateBikeAndGetItsId(dto);
+        
+        // Act
         var response = await _client.GetAsync($"/api/bike/{id}");
-        Assert.True(response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NotFound);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task Bike_Update_ShouldReturnOk()
     {
+        // Arrange
         await AddAuthHeader();
 
+        var yardId = await CreateYardAndGetItsId();
+        
         var dto = new BikeDTO
         {
             Plate = "ZZZ111",
             Model = "TOURING",
             Status = "READY",
-            YardId = 1
+            YardId = yardId
         };
         
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/bike", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var createdBike = JsonSerializer.Deserialize<BikeResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = createdBike?.Id ?? 1;
-
+        var id = await CreateBikeAndGetItsId(dto);
+        
         var updateDto = new BikeDTO
         {
             Plate = "ZZZ111",
             Model = "TOURING",
             Status = "BROKEN",
-            YardId = 1
+            YardId = yardId
         };
         
-        var updateContent = new StringContent(JsonSerializer.Serialize(updateDto), Encoding.UTF8, "application/json");
-        var updateResponse = await _client.PutAsync($"/api/bike/{id}", updateContent);
+        // Act
+        var response = await _client.PutAsJsonAsync($"/api/bike/{id}", updateDto);
 
-        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task Bike_Delete_ShouldReturnNoContent()
     {
+        // Arrange
         await AddAuthHeader();
 
+        var yardId = await CreateYardAndGetItsId();
+        
         var dto = new BikeDTO
         {
             Plate = "DEL222",
             Model = "SPORT",
             Status = "READY",
-            YardId = 1
+            YardId = yardId
         };
         
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/bike", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var createdBike = JsonSerializer.Deserialize<BikeResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = createdBike?.Id ?? 1;
+        var id = await CreateBikeAndGetItsId(dto);
 
-        var deleteResponse = await _client.DeleteAsync($"/api/bike/{id}");
-        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+        // Act
+        var response = await _client.DeleteAsync($"/api/bike/{id}");
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    private async Task<int> CreateBikeAndGetItsId(BikeDTO dto)
+    {
+        var response = await _client.PostAsJsonAsync("/api/bike", dto);
+        var json = await response.Content.ReadAsStringAsync();
+        
+        BikeResponse? bike = JsonConvert.DeserializeObject<BikeResponse>(json);
+        return bike?.Id ?? 1;
+    }
+    
+    private async Task<int> CreateYardAndGetItsId()
+    {
+        var subsidiaryDto = new SubsidiaryDTO
+        {
+            Name = "Osasco",
+            Address = "Rua dos Bobos, 123"
+        };
+        
+        var subsidiaryResponse = await _client.PostAsJsonAsync("/api/subsidiary",  subsidiaryDto);
+        var subsidiaryJson = await subsidiaryResponse.Content.ReadAsStringAsync();
+        SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(subsidiaryJson);
+
+        var yardDto = new YardDTO
+        {
+            Name = "Osasco I",
+            SubsidiaryId = subsidiary?.Id ?? 1
+        };
+            
+        var yardResponse = await _client.PostAsJsonAsync("/api/yard", yardDto);
+        var yardJson = await yardResponse.Content.ReadAsStringAsync();
+        YardResponse? yard = JsonConvert.DeserializeObject<YardResponse>(yardJson);
+        
+        return yard?.Id ?? 1;
     }
 }

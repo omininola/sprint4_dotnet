@@ -34,29 +34,13 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
-    private async Task<int> CreateSubsidiaryAndReturnItsId()
-    {
-        var dto = new SubsidiaryDTO
-        {
-            Name = "Osasco",
-            Address = "Rua dos Bobos, 123"
-        };
-
-        var response = await _client.PostAsJsonAsync("/api/subsidiaries", dto);
-        var json = await response.Content.ReadAsStringAsync();
-        SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(json);
-
-        if (subsidiary != null) return subsidiary.Id;
-        return 1;
-    }
-
     [Fact]
     public async Task Yard_Create_ShouldReturnCreated()
     {
         // Arrange
         await AddAuthHeader();
 
-        var subsidiaryId = await CreateSubsidiaryAndReturnItsId();
+        var subsidiaryId = await CreateSubsidiaryAndGetItsId();
         
         var dto = new YardDTO
         {
@@ -74,80 +58,111 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task ReadAll_ShouldReturnOk()
     {
+        // Arrange
         await AddAuthHeader();
-
+        
+        // Act
         var response = await _client.GetAsync("/api/yard?page=1&pageSize=10");
+        
+        // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task ReadById_ShouldReturnOkOrNotFound()
     {
+        // Arrange
         await AddAuthHeader();
 
-        // Create for test
+        var subsidiaryId = await CreateSubsidiaryAndGetItsId();        
+
         var dto = new YardDTO
         {
             Name = "Test Yard",
-            SubsidiaryId = 1
+            SubsidiaryId = subsidiaryId
         };
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/yard", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var created = JsonSerializer.Deserialize<YardResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = created?.Id ?? 1;
 
+        var id = await CreateYardAndGetItsId(dto);
+        
+        // Act
         var response = await _client.GetAsync($"/api/yard/{id}");
+
+        // Assert
         Assert.True(response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task Update_ShouldReturnOk()
     {
+        // Arrange
         await AddAuthHeader();
 
-        // Create for test
+        var subsidiaryId = await CreateSubsidiaryAndGetItsId();
+        
         var dto = new YardDTO
         {
             Name = "Old Yard",
-            SubsidiaryId = 1
+            SubsidiaryId = subsidiaryId
         };
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/yard", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var created = JsonSerializer.Deserialize<YardResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = created?.Id ?? 1;
 
-        // Prepare update
+        var id = await CreateYardAndGetItsId(dto);
+        
         var updateDto = new YardDTO
         {
             Name = "Updated Yard",
-            SubsidiaryId = 1
+            SubsidiaryId = subsidiaryId
         };
-        var updateContent = new StringContent(JsonSerializer.Serialize(updateDto), Encoding.UTF8, "application/json");
-        var updateResponse = await _client.PutAsync($"/api/yard/{id}", updateContent);
+        
+        // Act
+        var response = await _client.PutAsJsonAsync($"/api/yard/{id}", updateDto);
 
-        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task Delete_ShouldReturnNoContent()
     {
+        // Arrange
         await AddAuthHeader();
 
-        // Create for test
+        var subsidiaryId = await CreateSubsidiaryAndGetItsId();
+        
         var dto = new YardDTO
         {
             Name = "Del Yard",
-            SubsidiaryId = 1
+            SubsidiaryId = subsidiaryId
         };
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/yard", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var created = JsonSerializer.Deserialize<YardResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = created?.Id ?? 1;
+        
+        var id = await CreateYardAndGetItsId(dto);
 
-        var deleteResponse = await _client.DeleteAsync($"/api/yard/{id}");
-        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+        // Act
+        var response = await _client.DeleteAsync($"/api/yard/{id}");
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    private async Task<int> CreateYardAndGetItsId(YardDTO dto)
+    {
+        var response = await _client.PostAsJsonAsync("/api/yard", dto);
+        var json = await response.Content.ReadAsStringAsync();
+        YardResponse? yard = JsonConvert.DeserializeObject<YardResponse>(json);
+        return yard?.Id ?? 1;
+    }
+    
+    private async Task<int> CreateSubsidiaryAndGetItsId()
+    {
+        var dto = new SubsidiaryDTO
+        {
+            Name = "Osasco",
+            Address = "Rua dos Bobos, 123"
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/subsidiaries", dto);
+        var json = await response.Content.ReadAsStringAsync();
+        SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(json);
+
+        return subsidiary?.Id ?? 1;
     }
 }

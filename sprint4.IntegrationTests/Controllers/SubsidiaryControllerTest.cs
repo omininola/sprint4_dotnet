@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Newtonsoft.Json;
 using sprint4.DTO.Subsidiary;
 using sprint4.IntegrationTests;
 using Xunit;
@@ -105,10 +106,10 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         };
 
         // Act
-        var updateResponse = await _client.PutAsJsonAsync($"/api/subsidiary/{id}", updateDto);
+        var response = await _client.PutAsJsonAsync($"/api/subsidiary/{id}", updateDto);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
@@ -126,20 +127,18 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         var id = await CreateSubsidiaryAndGetItsId(dto);
         
         // Act
-        var deleteResponse = await _client.DeleteAsync($"/api/subsidiary/{id}");
+        var response = await _client.DeleteAsync($"/api/subsidiary/{id}");
         
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
     private async Task<int> CreateSubsidiaryAndGetItsId(SubsidiaryDTO dto)
     {
         var response = await _client.PostAsJsonAsync("/api/subsidiary", dto);
         var json = await response.Content.ReadAsStringAsync();
-        
-        var created = JsonSerializer.Deserialize<SubsidiaryResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = created?.Id ?? 1;
-        
-        return id;
+
+        SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(json);
+        return subsidiary?.Id ?? 1;
     }
 }
