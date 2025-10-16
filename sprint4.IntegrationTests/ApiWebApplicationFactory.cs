@@ -13,32 +13,33 @@ internal class ApiWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration((context, configBuilder) =>
+        //builder.ConfigureAppConfiguration((context, configBuilder) =>
+        //{
+        //    // Override config to use InMemory for tests!
+        //    var inMemorySettings = new Dictionary<string, string>
+        //    {
+        //        { "UseInMemoryDatabase", "true" }
+        //    };
+        //    configBuilder.AddInMemoryCollection(inMemorySettings);
+        //});
+
+        builder.ConfigureServices(services =>
         {
-            // Override config to use InMemory for tests!
-            var inMemorySettings = new Dictionary<string, string>
+            services.RemoveAll(typeof(AppDbContext));
+            services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
+
+            services.AddDbContext<AppDbContext>(options =>
             {
-                { "UseInMemoryDatabase", "true" }
-            };
-            configBuilder.AddInMemoryCollection(inMemorySettings);
+                var connectionString = "Data Source=oracle.fiap.com.br:1521/orcl;User ID=rm554513;Password=020905";
+                options.UseOracle(connectionString);
+            });
+
+            var sp = services.BuildServiceProvider();
+            using (var scope = sp.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.EnsureCreated();
+            }
         });
-        
-        // builder.ConfigureServices(services =>
-        // {
-        //     services.RemoveAll(typeof(AppDbContext));
-        //     services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
-        //     
-        //     services.AddDbContext<AppDbContext>(options =>
-        //     {
-        //         options.UseInMemoryDatabase("InMemoryDbForTesting");
-        //     });
-        //
-        //     var sp = services.BuildServiceProvider();
-        //     using (var scope = sp.CreateScope())
-        //     {
-        //         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        //         db.Database.EnsureCreated();
-        //     }
-        // });
     }
 }

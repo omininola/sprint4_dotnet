@@ -18,22 +18,22 @@ public class Program
 
         // Add services to the container.
 
-        // builder.Services.AddDbContext<AppDbContext>(options => options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        builder.Services.AddDbContext<AppDbContext>((sp, options) =>
-        {
-            var config = sp.GetRequiredService<IConfiguration>();
-            var useInMemory = config.GetValue<bool>("UseInMemoryDatabase");
+        //builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+        //{
+        //    var config = sp.GetRequiredService<IConfiguration>();
+        //    var useInMemory = config.GetValue<bool>("UseInMemoryDatabase");
 
-            if (useInMemory)
-            {
-                options.UseInMemoryDatabase("InMemoryDbForTesting");
-            }
-            else
-            {
-                options.UseOracle(config.GetConnectionString("DefaultConnection"));
-            }
-        });
+        //    if (useInMemory)
+        //    {
+        //        options.UseInMemoryDatabase("InMemoryDbForTesting");
+        //    }
+        //    else
+        //    {
+        //        options.UseOracle(config.GetConnectionString("DefaultConnection"));
+        //    }
+        //});
 
         builder.Services.AddScoped<IService<SubsidiaryResponse, SubsidiaryDTO>, SubsidiaryService>();
         builder.Services.AddScoped<IService<YardResponse, YardDTO>, YardService>();

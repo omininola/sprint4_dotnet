@@ -19,15 +19,21 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         _client = factory.CreateClient();
     }
 
-    private void AddAuthHeader(HttpClient client)
+    private async Task AddAuthHeader()
     {
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-jwt-token");
+        var response = await _client.PostAsync("/api/auth/login", null);
+        var json = await response.Content.ReadAsStringAsync();
+
+        using var doc = JsonDocument.Parse(json);
+        var token = doc.RootElement.GetProperty("token").GetString();
+
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
     [Fact]
     public async Task Create_ShouldReturnCreated()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
         var dto = new SubsidiaryDTO
         {
@@ -44,7 +50,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     [Fact]
     public async Task ReadAll_ShouldReturnOk()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
         var response = await _client.GetAsync("/api/subsidiary?page=1&pageSize=10");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -53,14 +59,14 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     [Fact]
     public async Task ReadById_ShouldReturnOkOrNotFound()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
-        // Create for test
         var dto = new SubsidiaryDTO
         {
             Name = "Test",
             Address = "Address"
         };
+
         var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
         var createResponse = await _client.PostAsync("/api/subsidiary", createContent);
         var createdJson = await createResponse.Content.ReadAsStringAsync();
@@ -74,26 +80,26 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     [Fact]
     public async Task Update_ShouldReturnOk()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
-        // Create for test
         var dto = new SubsidiaryDTO
         {
             Name = "OldName",
             Address = "OldAddress"
         };
+
         var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
         var createResponse = await _client.PostAsync("/api/subsidiary", createContent);
         var createdJson = await createResponse.Content.ReadAsStringAsync();
         var created = JsonSerializer.Deserialize<SubsidiaryResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         var id = created?.Id ?? 1;
 
-        // Prepare update
         var updateDto = new SubsidiaryDTO
         {
             Name = "NewName",
             Address = "NewAddress"
         };
+
         var updateContent = new StringContent(JsonSerializer.Serialize(updateDto), Encoding.UTF8, "application/json");
         var updateResponse = await _client.PutAsync($"/api/subsidiary/{id}", updateContent);
 
@@ -103,14 +109,14 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
     [Fact]
     public async Task Delete_ShouldReturnNoContent()
     {
-        AddAuthHeader(_client);
+        await AddAuthHeader();
 
-        // Create for test
         var dto = new SubsidiaryDTO
         {
             Name = "DelName",
             Address = "DelAddress"
         };
+
         var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
         var createResponse = await _client.PostAsync("/api/subsidiary", createContent);
         var createdJson = await createResponse.Content.ReadAsStringAsync();
