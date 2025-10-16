@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -19,80 +20,63 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         _client = factory.CreateClient();
     }
 
-    private async Task AddAuthHeader()
-    {
-        var response = await _client.PostAsync("/api/auth/login", null);
-        var json = await response.Content.ReadAsStringAsync();
-
-        using var doc = JsonDocument.Parse(json);
-        var token = doc.RootElement.GetProperty("token").GetString();
-
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-    }
-
     [Fact]
-    public async Task Create_ShouldReturnCreated()
+    public async Task Subsidiary_Create_ShouldReturnCreated()
     {
-        await AddAuthHeader();
-
+        // Arrange
         var dto = new SubsidiaryDTO
         {
             Name = "Osasco",
             Address = "Rua dos Bobos, 123"
         };
+     
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/subsidiary", dto);
 
-        var content = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var response = await _client.PostAsync("/api/subsidiary", content);
-
+        // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]
-    public async Task ReadAll_ShouldReturnOk()
+    public async Task Subsidiary_ReadAll_ShouldReturnOk()
     {
-        await AddAuthHeader();
-
+        // Act
         var response = await _client.GetAsync("/api/subsidiary?page=1&pageSize=10");
+        
+        // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task ReadById_ShouldReturnOkOrNotFound()
+    public async Task Subsidiary_ReadById_ShouldReturnOk()
     {
-        await AddAuthHeader();
-
+        // Arrange
         var dto = new SubsidiaryDTO
         {
             Name = "Test",
             Address = "Address"
         };
 
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/subsidiary", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var created = JsonSerializer.Deserialize<SubsidiaryResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = created?.Id ?? 1;
+        var id = await CreateSubsidiaryAndGetItsId(dto);
 
+        // Act
         var response = await _client.GetAsync($"/api/subsidiary/{id}");
-        Assert.True(response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NotFound);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
-
+    
     [Fact]
-    public async Task Update_ShouldReturnOk()
+    public async Task Subsidiary_Update_ShouldReturnOk()
     {
-        await AddAuthHeader();
-
+        // Arrange
         var dto = new SubsidiaryDTO
         {
             Name = "OldName",
             Address = "OldAddress"
         };
 
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/subsidiary", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var created = JsonSerializer.Deserialize<SubsidiaryResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = created?.Id ?? 1;
+        var id = await CreateSubsidiaryAndGetItsId(dto);
 
         var updateDto = new SubsidiaryDTO
         {
@@ -100,30 +84,40 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
             Address = "NewAddress"
         };
 
-        var updateContent = new StringContent(JsonSerializer.Serialize(updateDto), Encoding.UTF8, "application/json");
-        var updateResponse = await _client.PutAsync($"/api/subsidiary/{id}", updateContent);
+        // Act
+        var updateResponse = await _client.PutAsJsonAsync($"/api/subsidiary/{id}", updateDto);
 
+        // Assert
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
     }
 
     [Fact]
-    public async Task Delete_ShouldReturnNoContent()
+    public async Task Subsidiary_Delete_ShouldReturnNoContent()
     {
-        await AddAuthHeader();
-
+        // Arrange
         var dto = new SubsidiaryDTO
         {
             Name = "DelName",
             Address = "DelAddress"
         };
 
-        var createContent = new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
-        var createResponse = await _client.PostAsync("/api/subsidiary", createContent);
-        var createdJson = await createResponse.Content.ReadAsStringAsync();
-        var created = JsonSerializer.Deserialize<SubsidiaryResponse>(createdJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var id = created?.Id ?? 1;
-
+        var id = await CreateSubsidiaryAndGetItsId(dto);
+        
+        // Act
         var deleteResponse = await _client.DeleteAsync($"/api/subsidiary/{id}");
+        
+        // Assert
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+    }
+
+    private async Task<int> CreateSubsidiaryAndGetItsId(SubsidiaryDTO dto)
+    {
+        var response = await _client.PostAsJsonAsync("/api/subsidiary", dto);
+        var json = await response.Content.ReadAsStringAsync();
+        
+        var created = JsonSerializer.Deserialize<SubsidiaryResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var id = created?.Id ?? 1;
+        
+        return id;
     }
 }

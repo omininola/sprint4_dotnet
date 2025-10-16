@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using sprint4.Data;
@@ -15,7 +15,6 @@ internal class ApiWebApplicationFactory : WebApplicationFactory<Program>
     {
         //builder.ConfigureAppConfiguration((context, configBuilder) =>
         //{
-        //    // Override config to use InMemory for tests!
         //    var inMemorySettings = new Dictionary<string, string>
         //    {
         //        { "UseInMemoryDatabase", "true" }
@@ -23,7 +22,7 @@ internal class ApiWebApplicationFactory : WebApplicationFactory<Program>
         //    configBuilder.AddInMemoryCollection(inMemorySettings);
         //});
 
-        builder.ConfigureServices(services =>
+        builder.ConfigureTestServices(services =>
         {
             services.RemoveAll(typeof(AppDbContext));
             services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
@@ -33,6 +32,10 @@ internal class ApiWebApplicationFactory : WebApplicationFactory<Program>
                 var connectionString = "Data Source=oracle.fiap.com.br:1521/orcl;User ID=rm554513;Password=020905";
                 options.UseOracle(connectionString);
             });
+            
+            services.AddAuthentication("TestScheme")
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    "TestScheme", options => { });
 
             var sp = services.BuildServiceProvider();
             using (var scope = sp.CreateScope())
