@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sprint4.DTO.Bike;
@@ -7,7 +8,8 @@ using sprint4.Services;
 namespace sprint4.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class BikeController : Controller
 {
     private readonly IService<BikeResponse, BikeDTO> _service;

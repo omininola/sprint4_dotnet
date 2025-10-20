@@ -25,7 +25,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
 
     private async Task AddAuthHeader()
     {
-        var response = await _client.PostAsync("/api/auth/login", null);
+        var response = await _client.PostAsync("/api/v1/auth/login", null);
         var json = await response.Content.ReadAsStringAsync();
         
         using var doc = JsonDocument.Parse(json);
@@ -49,7 +49,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/yard", dto);
+        var response = await _client.PostAsJsonAsync("/api/v1/yard", dto);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -62,7 +62,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
         await AddAuthHeader();
         
         // Act
-        var response = await _client.GetAsync("/api/yard?page=1&pageSize=10");
+        var response = await _client.GetAsync("/api/v1/yard?page=1&pageSize=10");
         
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -85,7 +85,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
         var id = await CreateYardAndGetItsId(dto);
         
         // Act
-        var response = await _client.GetAsync($"/api/yard/{id}");
+        var response = await _client.GetAsync($"/api/v1/yard/{id}");
 
         // Assert
         Assert.True(response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NotFound);
@@ -114,7 +114,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
         };
         
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/yard/{id}", updateDto);
+        var response = await _client.PutAsJsonAsync($"/api/v1/yard/{id}", updateDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -137,7 +137,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
         var id = await CreateYardAndGetItsId(dto);
 
         // Act
-        var response = await _client.DeleteAsync($"/api/yard/{id}");
+        var response = await _client.DeleteAsync($"/api/v1/yard/{id}");
         
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -145,7 +145,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
 
     private async Task<int> CreateYardAndGetItsId(YardDTO dto)
     {
-        var response = await _client.PostAsJsonAsync("/api/yard", dto);
+        var response = await _client.PostAsJsonAsync("/api/v1/yard", dto);
         var json = await response.Content.ReadAsStringAsync();
         YardResponse? yard = JsonConvert.DeserializeObject<YardResponse>(json);
         return yard?.Id ?? 1;
@@ -159,7 +159,7 @@ public class YardControllerTests : IClassFixture<WebApplicationFactory<Program>>
             Address = "Rua dos Bobos, 123"
         };
 
-        var response = await _client.PostAsJsonAsync("/api/subsidiaries", dto);
+        var response = await _client.PostAsJsonAsync("/api/v1/subsidiaries", dto);
         var json = await response.Content.ReadAsStringAsync();
         SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(json);
 

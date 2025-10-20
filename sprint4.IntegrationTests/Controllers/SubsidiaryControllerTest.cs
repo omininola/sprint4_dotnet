@@ -23,7 +23,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
 
     private async Task AddAuthHeader()
     {
-        var response = await _client.PostAsync("/api/auth/login", null);
+        var response = await _client.PostAsync("/api/v1/auth/login", null);
         var json = await response.Content.ReadAsStringAsync();
         
         using var doc = JsonDocument.Parse(json);
@@ -45,7 +45,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         };
      
         // Act
-        var response = await _client.PostAsJsonAsync("/api/subsidiary", dto);
+        var response = await _client.PostAsJsonAsync("/api/v1/subsidiary", dto);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -58,7 +58,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         await AddAuthHeader();
         
         // Act
-        var response = await _client.GetAsync("/api/subsidiary?page=1&pageSize=10");
+        var response = await _client.GetAsync("/api/v1/subsidiary?page=1&pageSize=10");
         
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -79,7 +79,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         var id = await CreateSubsidiaryAndGetItsId(dto);
 
         // Act
-        var response = await _client.GetAsync($"/api/subsidiary/{id}");
+        var response = await _client.GetAsync($"/api/v1/subsidiary/{id}");
         
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -106,7 +106,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/subsidiary/{id}", updateDto);
+        var response = await _client.PutAsJsonAsync($"/api/v1/subsidiary/{id}", updateDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -127,7 +127,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
         var id = await CreateSubsidiaryAndGetItsId(dto);
         
         // Act
-        var response = await _client.DeleteAsync($"/api/subsidiary/{id}");
+        var response = await _client.DeleteAsync($"/api/v1/subsidiary/{id}");
         
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -135,7 +135,7 @@ public class SubsidiaryControllerTests : IClassFixture<WebApplicationFactory<Pro
 
     private async Task<int> CreateSubsidiaryAndGetItsId(SubsidiaryDTO dto)
     {
-        var response = await _client.PostAsJsonAsync("/api/subsidiary", dto);
+        var response = await _client.PostAsJsonAsync("/api/v1/subsidiary", dto);
         var json = await response.Content.ReadAsStringAsync();
 
         SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(json);

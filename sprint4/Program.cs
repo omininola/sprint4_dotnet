@@ -1,4 +1,5 @@
 using System.Text;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -26,6 +27,20 @@ public class Program
         builder.Services.AddControllers(opt =>
         {
             opt.Filters.Add<ExceptionFilter>();
+        });
+
+        builder.Services.AddHealthChecks();
+
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+        }).
+        AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "v'VVV";
+            options.SubstituteApiVersionInUrl = true;
         });
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -94,6 +109,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
+        app.MapHealthChecks("/health");
         app.Run();
     }
 }

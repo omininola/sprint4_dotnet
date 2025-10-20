@@ -24,7 +24,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
 
     private async Task AddAuthHeader()
     {
-        var response = await _client.PostAsync("/api/auth/login", null);
+        var response = await _client.PostAsync("/api/v1/auth/login", null);
         var json = await response.Content.ReadAsStringAsync();
         
         using var doc = JsonDocument.Parse(json);
@@ -50,7 +50,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/bike", dto);
+        var response = await _client.PostAsJsonAsync("/api/v1/bike", dto);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -63,7 +63,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
         await AddAuthHeader();
 
         // Act
-        var response = await _client.GetAsync("/api/bike?page=0&pageSize=10");
+        var response = await _client.GetAsync("/api/v1/bike?page=0&pageSize=10");
         
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -88,7 +88,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
         var id = await CreateBikeAndGetItsId(dto);
         
         // Act
-        var response = await _client.GetAsync($"/api/bike/{id}");
+        var response = await _client.GetAsync($"/api/v1/bike/{id}");
         
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -121,7 +121,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
         };
         
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/bike/{id}", updateDto);
+        var response = await _client.PutAsJsonAsync($"/api/v1/bike/{id}", updateDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -146,7 +146,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
         var id = await CreateBikeAndGetItsId(dto);
 
         // Act
-        var response = await _client.DeleteAsync($"/api/bike/{id}");
+        var response = await _client.DeleteAsync($"/api/v1/bike/{id}");
         
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -154,7 +154,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
 
     private async Task<int> CreateBikeAndGetItsId(BikeDTO dto)
     {
-        var response = await _client.PostAsJsonAsync("/api/bike", dto);
+        var response = await _client.PostAsJsonAsync("/api/v1/bike", dto);
         var json = await response.Content.ReadAsStringAsync();
         
         BikeResponse? bike = JsonConvert.DeserializeObject<BikeResponse>(json);
@@ -169,7 +169,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
             Address = "Rua dos Bobos, 123"
         };
         
-        var subsidiaryResponse = await _client.PostAsJsonAsync("/api/subsidiary",  subsidiaryDto);
+        var subsidiaryResponse = await _client.PostAsJsonAsync("/api/v1/subsidiary",  subsidiaryDto);
         var subsidiaryJson = await subsidiaryResponse.Content.ReadAsStringAsync();
         SubsidiaryResponse? subsidiary = JsonConvert.DeserializeObject<SubsidiaryResponse>(subsidiaryJson);
 
@@ -179,7 +179,7 @@ public class BikeControllerTests : IClassFixture<WebApplicationFactory<Program>>
             SubsidiaryId = subsidiary?.Id ?? 1
         };
             
-        var yardResponse = await _client.PostAsJsonAsync("/api/yard", yardDto);
+        var yardResponse = await _client.PostAsJsonAsync("/api/v1/yard", yardDto);
         var yardJson = await yardResponse.Content.ReadAsStringAsync();
         YardResponse? yard = JsonConvert.DeserializeObject<YardResponse>(yardJson);
         
