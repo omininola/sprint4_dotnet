@@ -1,7 +1,11 @@
 using System.Text;
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using sprint4.Data;
@@ -29,17 +33,23 @@ public class Program
             opt.Filters.Add<ExceptionFilter>();
         });
 
-        builder.Services.AddHealthChecks();
+        builder.Services.AddHealthChecks()
+            .AddCheck("self", () => HealthCheckResult.Healthy("API OK"))
+            .AddOracle(
+                connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+                name: "Oracle DB Check",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: new[] { "db", "oracle" });
 
         builder.Services.AddApiVersioning(options =>
         {
             options.DefaultApiVersion = new ApiVersion(1, 0);
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
-        }).
-        AddApiExplorer(options =>
+        })
+        .AddApiExplorer(options =>
         {
-            options.GroupNameFormat = "v'VVV";
+            options.GroupNameFormat = "'v'VVV";
             options.SubstituteApiVersionInUrl = true;
         });
 
@@ -49,10 +59,21 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
+            var sp = builder.Services.BuildServiceProvider()
+                .GetRequiredService<IApiVersionDescriptionProvider>();
+
+            foreach (var desc in sp.ApiVersionDescriptions)
+            {
+                c.SwaggerDoc(desc.GroupName, new OpenApiInfo
+                {
+                    Title = $"Sprint 04 API {desc.ApiVersion}", 
+                    Version = desc.ApiVersion.ToString()
+                });
+            }
+            
             var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             c.IncludeXmlComments(xmlPath);
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sprint04 .NET API", Version = "v1" });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -100,16 +121,27 @@ public class Program
             });
 
         var app = builder.Build();
-
+        
         // Configure the HTTP request pipeline.
         app.UseSwagger();
-        app.UseSwaggerUI();
         app.MapOpenApi();
+        
+        app.UseSwaggerUI(options =>
+        {
+            var sp = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+            foreach (var desc in sp.ApiVersionDescriptions)
+            {
+                options.SwaggerEndpoint($"/swagger/{desc.GroupName}/swagger.json", desc.GroupName.ToUpperInvariant());   
+            }
+        });
 
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
-        app.MapHealthChecks("/api/health");
+        app.MapHealthChecks("/api/health", new HealthCheckOptions()
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
         app.Run();
     }
 }
