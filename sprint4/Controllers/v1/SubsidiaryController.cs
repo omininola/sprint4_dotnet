@@ -13,11 +13,14 @@ namespace sprint4.Controllers;
 public class SubsidiaryController : Controller
 {
     private readonly IService<SubsidiaryResponse, SubsidiaryDTO> _service;
+    private readonly PredictionService _predictionService;
+    
     private readonly LinkGenerator _linkGenerator;
 
-    public SubsidiaryController(IService<SubsidiaryResponse, SubsidiaryDTO> service, LinkGenerator linkGenerator)
+    public SubsidiaryController(IService<SubsidiaryResponse, SubsidiaryDTO> service,  PredictionService predictionService, LinkGenerator linkGenerator)
     {
         _service = service;
+        _predictionService = predictionService;
         _linkGenerator = linkGenerator;
     }
 
@@ -142,5 +145,30 @@ public class SubsidiaryController : Controller
     {
         await _service.Delete(id);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Retorna uma aproximação de quantas motos cabem em uma filial com base em seu metro quadrado
+    /// </summary>
+    /// <returns>O número motos aproximado</returns>
+    /// <response code="200">Retorna as informações com base no metro quadrado</response>
+    [HttpGet("predict")]
+    [Authorize]
+    public async Task<ActionResult<SubsidiaryPredictionResponse>> Predict([FromQuery] float? metros)
+    {
+        if (metros == null || metros <= 0)
+            BadRequest("Os metros quadrados da filial devem ser passados para realizarmos a aproximação");
+        
+        var result = _predictionService.Predict(metros.GetValueOrDefault());
+        var rounded = (int)Math.Round(result.PredictedMotorcycles);
+        
+        var response = new SubsidiaryPredictionResponse
+        {
+            Area = metros.GetValueOrDefault(),
+            Prediction = result.PredictedMotorcycles,
+            Rounded = rounded
+        };
+        
+        return Ok(response);
     }
 }

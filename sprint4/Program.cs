@@ -120,6 +120,12 @@ public class Program
                 };
             });
 
+        builder.Services.AddSingleton<PredictionService>(sp =>
+        {
+            var env = sp.GetRequiredService<IHostEnvironment>();
+            return new PredictionService(env);
+        });
+        
         var app = builder.Build();
         
         // Configure the HTTP request pipeline.

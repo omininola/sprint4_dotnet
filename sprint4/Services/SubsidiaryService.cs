@@ -11,7 +11,7 @@ public class SubsidiaryService : IService<SubsidiaryResponse, SubsidiaryDTO>
 
     private readonly string NOT_FOUND_MESSAGE = "Filial com esse ID não foi encontrada.";
     
-    public SubsidiaryService(AppDbContext context)
+    public SubsidiaryService(AppDbContext context, PredictionService predictionService)
     {
         _context = context;
     }
